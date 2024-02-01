@@ -1,0 +1,41 @@
+# the config for current running
+dataset:
+  data_path: 
+  batch_size: 64
+  num_workers: 2
+
+model:
+  name: resnet101
+  num_classes: 6
+
+optim:
+  optimizer: Adam
+  loss: ce
+  # gradient clipping
+  clip: 12
+  lr: 1.e-5
+  weight_decay: 0
+  epochs: 30
+  save_period: 1
+  # lr_scheduler: if warmup, the step will be 
+  lr_scheduler: warmup
+  step_size: 1
+  amsgrad: true
+
+stat:
+  monitor:
+    mode:
+    metric:
+    early_stop:
+    metric_curves: false
+    display_port: 8099
+  save_dir:
+  record_dir:
+  resume:
+
+misc:
+  # the name only for this running, not the task
+  running_name: 'temp'
+  cuda: "2"
+  seed: 666
+  
