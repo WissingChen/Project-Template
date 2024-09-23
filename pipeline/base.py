@@ -6,7 +6,6 @@ import pandas as pd
 from numpy import inf
 from models import model_fns
 from utils import *
-from utils.misc.misc import compute_a2v
 
 
 class BasePipeline(object):
@@ -14,19 +13,18 @@ class BasePipeline(object):
         self.cfgs = cfgs
         # set cuda device
         os.environ['CUDA_VISIBLE_DEVICES'] = cfgs["misc"]["cuda"]
-        # torch.cuda.set_device(int(cfgs["misc"]["cuda"]))
         os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
 
         # build dataloader
         self.train_dataloader, self.val_dataloader, self.test_dataloader = build_dataloaders(cfgs)
         # build model
         self.model = model_fns[cfgs["model"]["name"]](cfgs).cuda()
-        if torch.cuda.device_count() > 1:
-            self.model = torch.nn.DataParallel(self.model)
+        # if torch.cuda.device_count() > 1:
+            # self.model = torch.nn.DataParallel(self.model)
         # metric
         self.metric = Metric(cfgs)
         # loss
-        self.criterion = loss_fns[cfgs["optim"]["loss"]]
+        self.criterion = BuildLossFunc(cfgs)
         # optim
         self.optimizer = build_optimizer(cfgs, self.model)
         # lr_scheduler

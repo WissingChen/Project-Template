@@ -6,10 +6,11 @@ This is a template for project programming. It
 - [x] Dataset
 - [x] Dataloader
 - [x] model
-- [x] monitor
 - [x] metric
-- [x] optimizer
-- [x] lr_scheduler
 - [x] loss
+- [x] optimizer
 - [x] pipeline
+- [x] lr_scheduler
+- [ ] monitor
 - [ ] visualization
+- [ ] multi-gpu

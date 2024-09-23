@@ -1,41 +1,42 @@
 # the config for current running
 dataset:
-  data_path: 
+  data_path: "data/MNIST"
   batch_size: 64
   num_workers: 2
 
 model:
-  name: resnet101
-  num_classes: 6
+  name: mlp
+  num_classes: 10
 
 optim:
+  pipeline: classification
   optimizer: Adam
-  loss: ce
+  loss: {"ce": 1}
   # gradient clipping
   clip: 12
   lr: 1.e-5
   weight_decay: 0
-  epochs: 30
+  epochs: 100
   save_period: 1
   # lr_scheduler: if warmup, the step will be 
   lr_scheduler: warmup
-  step_size: 1
+  step_size: 10
   amsgrad: true
 
 stat:
   monitor:
-    mode:
-    metric:
-    early_stop:
-    metric_curves: false
+    mode: max
+    metric: Acc.
+    early_stop: 50
+    vis: false
     display_port: 8099
-  save_dir:
-  record_dir:
+  record_dir: ./output
   resume:
 
 misc:
-  # the name only for this running, not the task
-  running_name: 'temp'
-  cuda: "2"
-  seed: 666
-  
+  # the name only for this running, not the task. And it will be the dir name for result saving.
+  running_name: 'Baseline/mlp'
+  # more detial of this running
+  info: "use the mlp for mnist"
+  cuda: "3"
+  seed: 42

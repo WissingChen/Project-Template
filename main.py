@@ -1,27 +1,19 @@
-import torch
-import numpy as np
-import random 
 import argparse
+from utils.misc import setup_seed, load_file
+import numpy as np
 import yaml
 from pipeline import *
-
-
-def setup_seed(seed):
-    torch.manual_seed(seed)
-    torch.cuda.manual_seed_all(seed)
-    np.random.seed(seed)
-    random.seed(seed) 
-    torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = False
 
 
 def main(args):
     # -------------------------------
     # load hyper-param
     # -------------------------------
-    cfgs = yaml.load(open(args.cfg), Loader=yaml.FullLoader)
+    cfgs = load_file(args.cfg)
     if args.cuda != "":
         cfgs["misc"]["cuda"] = args.cuda
+    if args.R != "":
+        cfgs["misc"]["running_name"] = args.R
     # -------------------------------
     # fix random seeds
     # -------------------------------
@@ -29,14 +21,20 @@ def main(args):
         cfgs["misc"]["seed"] = np.random.randint(0, 23333)
     setup_seed(cfgs["misc"]["seed"])
     print(cfgs)
-    
-    pipeline = pipeline_fns["causalgqa"](cfgs)
+    # -------------------------------
+    # Run!
+    # -------------------------------
+    pipeline = pipeline_fns[cfgs['optim']['pipeline']](cfgs)
     pipeline.train()
     
 if __name__ == "__main__":
     parse = argparse.ArgumentParser()
-    parse.add_argument("-cfg", type=str, default="config/causalgqa.yml")
-    parse.add_argument("-cuda", type=str, default="")
+    # 选用哪个配置文件
+    parse.add_argument("--cfg", type=str, default="config/example.yml")
+    # 会优先使用由终端指定的cuda
+    parse.add_argument("--cuda", type=str, default="2")
+    # 会优先使用由终端指定的运行名字，用于保存实验记录
+    parse.add_argument("-R", type=str, default="")
     args = parse.parse_args()
 
     main(args)

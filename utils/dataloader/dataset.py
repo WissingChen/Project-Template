@@ -1,18 +1,18 @@
 import os.path as osp
 import torch
-import h5py
 from torch.utils.data import Dataset
-import numpy as np
-import pandas as pd
-import random
-
+from torchvision.datasets import MNIST
 
 class BaseDataset(Dataset):
     def __init__(self, cfgs, split, transform=None):
-        pass
+        self.data = MNIST('./data',train=True if split == "train" else False, download=False)
+        self.transform = transform
 
     def __len__(self):
-        return len(self.data_list)
+        return len(self.data)
 
-    def __getitem__(self):
-        pass
+    def __getitem__(self, item):
+        img, label = self.data[item]
+        if self.transform is not None:
+            img = self.transform(img)
+        return img, label

@@ -35,7 +35,8 @@ class Monitor(object):
 
         self.name2val = defaultdict(float)  # values this iteration
         self.name2cnt = defaultdict(int)
-        if cfgs["stat"]["monitor"]["metric_curves"]:
+
+        if cfgs["stat"]["monitor"]["vis"]:
             self.display_id = 1
             self.use_html = True
             self.win_size = 160
@@ -49,15 +50,12 @@ class Monitor(object):
             if self.use_html:
                 self.web_dir = osp.join(self.record_dir, 'web')
                 self.img_dir = os.path.join(self.web_dir, 'images')
+                self.csv_dir = os.path.join(self.web_dir, 'csv')
                 if osp.exists(self.web_dir) is False:
                     os.mkdir(self.web_dir)
                     os.mkdir(self.img_dir)
+                    os.mkdir(self.csv_dir)
                 print('create web directory %s for visualization...' % self.web_dir)
-                # util.mkdirs([self.web_dir, self.img_dir])
-            # self.log_name = os.path.join(opt['path']['checkpoint'], 'loss_log.txt')
-            # with open(self.log_name, "a") as log_file:
-            #     now = time.strftime("%c")
-            #     log_file.write('================ Training Loss (%s) ================\n' % now)
 
     def logkv_mean(self, key, val):
         oldval, cnt = self.name2val[key], self.name2cnt[key]
@@ -89,9 +87,10 @@ class Monitor(object):
 
     def reset_visdom(self):
         self.saved = False
+    
 
+    # TODO load old data and merge new data, then vis metric and images and save it.
     # |visuals|: dictionary of images to display or save\
-
     def display_current_images(self, visuals, epoch, save_result):
         if self.display_id > 0:  # show images in the browser
             ncols = 0  # self.opt.display_single_pane_ncols
@@ -301,32 +300,6 @@ class Monitor(object):
 
 def get_timestamp():
     return datetime.now().strftime('%y%m%d_%H%M%S')
-
-
-def dict2str(opt, indent_l=1):
-    """dict to string for logger"""
-    msg = ''
-    for k, v in opt.items():
-        if isinstance(v, dict):
-            msg += ' ' * (indent_l * 2) + k + ':[\n'
-            msg += dict2str(v, indent_l + 1)
-            msg += ' ' * (indent_l * 2) + ']\n'
-        else:
-            msg += ' ' * (indent_l * 2) + k + ': ' + str(v) + '\n'
-    return msg
-
-
-def kv2arr(opt):
-    arr = '-' * 25
-    arr += f'\nstep: {opt["step"]}\n'
-    arr += f'samples: {opt["samples"]}\n'
-    arr += f'mse: {opt["mse"]:.4f}\n'
-    arr += f'mse_4q: [{opt["mse_q0"]:.4f}, {opt["mse_q1"]:.4f}, {opt["mse_q2"]:.4f}, {opt["mse_q3"]:.4f}]\n'
-    arr += f'loss: {opt["loss"]:.4f}\n'
-    arr += f'loss_4q: [{opt["loss_q0"]:.4f}, {opt["loss_q1"]:.4f}, {opt["loss_q2"]:.4f}, {opt["loss_q3"]:.4f}]\n'
-    arr += f'grad_norm: {opt["grad_norm"]}\n'
-    arr += f'param_norm: {opt["param_norm"]}'
-    return arr
 
 
 def save_image(image_numpy, image_path):
